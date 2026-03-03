@@ -1,0 +1,1303 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Event Staff Tracker</title>
+
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #14161a;
+            --panel: rgba(255,255,255,0.06);
+            --stroke: rgba(255,255,255,0.10);
+            --text: #eef1f6;
+            --muted: rgba(238,241,246,0.68);
+            --brand: #7289da;
+            --danger: #ff6b6b;
+            --shadow: 0 18px 60px rgba(0,0,0,0.45);
+            --radius: 18px;
+            --field-bg: rgba(0,0,0,0.26);
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter',sans-serif;
+            color: var(--text);
+            background: radial-gradient(1200px 600px at 20% -10%, rgba(114,137,218,0.28), transparent 60%), radial-gradient(900px 500px at 90% 10%, rgba(255,107,107,0.18), transparent 60%), radial-gradient(900px 700px at 50% 120%, rgba(114,137,218,0.18), transparent 60%), var(--bg);
+            min-height: 100vh;
+            color-scheme: dark;
+        }
+
+        .glass {
+            background: var(--panel);
+            border: 1px solid var(--stroke);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        /* LOADER */
+        .loader {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: grid;
+            place-items: center;
+            background: radial-gradient(900px 420px at 50% 38%, rgba(114,137,218,0.28), transparent 60%), radial-gradient(700px 360px at 30% 60%, rgba(255,107,107,0.16), transparent 60%), radial-gradient(800px 420px at 75% 70%, rgba(0,255,255,0.10), transparent 60%), #0f1115;
+            overflow: hidden;
+        }
+
+            .loader::before {
+                content: "";
+                position: absolute;
+                inset: -40%;
+                background: conic-gradient(from 180deg, rgba(114,137,218,0.0), rgba(114,137,218,0.25), rgba(0,255,255,0.18), rgba(255,107,107,0.18), rgba(114,137,218,0.0) );
+                filter: blur(28px);
+                opacity: .9;
+                animation: spin 7s linear infinite;
+            }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .loader-inner {
+            position: relative;
+            width: min(720px,92vw);
+            padding: 26px 22px 18px;
+            border-radius: 22px;
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(0,0,0,0.35);
+            box-shadow: 0 22px 70px rgba(0,0,0,0.55);
+            backdrop-filter: blur(14px);
+            text-align: center;
+        }
+
+        .loader-title {
+            font-weight: 800;
+            font-size: 22px;
+            letter-spacing: .3px
+        }
+
+        .loader-sub {
+            margin-top: 8px;
+            font-size: 13px;
+            color: rgba(238,241,246,0.75)
+        }
+
+        .bar {
+            margin-top: 16px;
+            height: 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(255,255,255,0.06);
+            overflow: hidden;
+            position: relative;
+        }
+
+            .bar > span {
+                position: absolute;
+                inset: 0;
+                width: 38%;
+                border-radius: 999px;
+                background: linear-gradient(90deg, rgba(114,137,218,0.0), rgba(114,137,218,0.55), rgba(0,255,255,0.45), rgba(255,107,107,0.35), rgba(114,137,218,0.0) );
+                animation: shimmer 1.25s ease-in-out infinite;
+            }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-55%)
+            }
+
+            100% {
+                transform: translateX(215%)
+            }
+        }
+
+        .loader-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 12px;
+            color: rgba(238,241,246,0.62)
+        }
+
+        .loader.hide {
+            animation: fadeOut .55s ease forwards
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                visibility: hidden
+            }
+        }
+
+        /* LOGIN */
+        .login-wrap {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 24px
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 560px;
+            padding: 26px
+        }
+
+        .title {
+            font-size: 28px;
+            margin: 0 0 6px
+        }
+
+        .subtitle {
+            margin: 0 0 16px;
+            color: var(--muted);
+            font-size: 14px
+        }
+
+        .stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 13px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.10);
+            background: var(--field-bg);
+            color: var(--text);
+            outline: none;
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical
+        }
+
+            input::placeholder, textarea::placeholder {
+                color: rgba(238,241,246,0.42)
+            }
+
+        select {
+            color-scheme: dark
+        }
+
+            select option {
+                background: #151a22;
+                color: var(--text)
+            }
+
+        .btn {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.10);
+            cursor: pointer;
+            background: rgba(0,0,0,0.20);
+            color: var(--text);
+            transition: .15s ease;
+            font-weight: 600;
+        }
+
+            .btn:hover {
+                transform: translateY(-1px);
+                background: rgba(255,255,255,0.08)
+            }
+
+        .btn-primary {
+            background: rgba(114,137,218,0.28);
+            border-color: rgba(114,137,218,0.45)
+        }
+
+            .btn-primary:hover {
+                background: rgba(114,137,218,0.36)
+            }
+
+        .btn-mini {
+            width: auto;
+            padding: 8px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.10);
+            color: var(--text);
+            cursor: pointer;
+        }
+
+            .btn-mini:hover {
+                background: rgba(255,255,255,0.10);
+                transform: translateY(-1px)
+            }
+
+        .mini {
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .error {
+            color: var(--danger);
+            margin: 6px 0 0;
+            font-size: 13px
+        }
+
+        /* APP */
+        .app {
+            display: none;
+            min-height: 100vh
+        }
+
+        .shell {
+            display: grid;
+            grid-template-columns: 270px minmax(0,1fr);
+            gap: 18px;
+            padding: 18px;
+            max-width: 1300px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .sidebar {
+            padding: 18px;
+            position: sticky;
+            top: 18px;
+            height: calc(100vh - 36px);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .brand {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.08)
+        }
+
+            .brand .name {
+                font-weight: 700;
+                font-size: 16px
+            }
+
+        .pill {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            background: rgba(114,137,218,0.20);
+            border: 1px solid rgba(114,137,218,0.35);
+            white-space: nowrap;
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 6px
+        }
+
+            .nav button {
+                text-align: left;
+                width: 100%;
+                border-radius: 14px;
+                padding: 11px 12px;
+                background: rgba(255,255,255,0.04);
+                border: 1px solid rgba(255,255,255,0.08);
+                color: var(--text);
+                cursor: pointer;
+                font-weight: 600;
+                transition: .15s ease;
+            }
+
+                .nav button:hover {
+                    background: rgba(255,255,255,0.08)
+                }
+
+                .nav button.active {
+                    background: rgba(114,137,218,0.22);
+                    border-color: rgba(114,137,218,0.40)
+                }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            min-width: 0
+        }
+
+        .topbar {
+            padding: 18px;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px
+        }
+
+            .topbar h2 {
+                margin: 0;
+                font-size: 18px
+            }
+
+            .topbar .muted {
+                color: var(--muted);
+                font-size: 13px;
+                margin-top: 4px
+            }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 18px
+        }
+
+        .tab {
+            display: none
+        }
+
+            .tab.active {
+                display: block
+            }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 220px;
+            gap: 12px;
+            margin-top: 10px
+        }
+
+        .notes {
+            padding: 18px
+        }
+
+        .note {
+            position: relative;
+            padding: 16px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            margin-top: 12px;
+            transition: .15s ease;
+        }
+
+            .note:hover {
+                transform: translateY(-1px);
+                background: rgba(255,255,255,0.07)
+            }
+
+        .note-title {
+            font-weight: 700;
+            font-size: 16px;
+            margin: 0 0 6px
+        }
+
+        .note-meta {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 10px
+        }
+
+        .note-text {
+            font-size: 14px;
+            line-height: 1.45;
+            white-space: pre-wrap;
+            word-wrap: break-word
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: auto;
+            padding: 7px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            background: rgba(255,107,107,0.14);
+            border: 1px solid rgba(255,107,107,0.25);
+            color: var(--danger);
+            cursor: pointer;
+        }
+
+            .delete-btn:hover {
+                background: rgba(255,107,107,0.20)
+            }
+
+        .card {
+            padding: 18px
+        }
+
+        .hint {
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .prompt-grid {
+            display: grid;
+            grid-template-columns: repeat(2,minmax(0,1fr));
+            gap: 12px;
+            margin-top: 12px
+        }
+
+            .prompt-grid button {
+                grid-column: 1 / -1
+            }
+
+        .prompt-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px
+        }
+
+            .prompt-actions .btn {
+                width: 100%
+            }
+
+        /* DECISIONS + STORAGE */
+        .list-wrap {
+            padding: 18px
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.05);
+            margin-top: 10px;
+        }
+
+        .left {
+            min-width: 0
+        }
+
+        .nm {
+            font-weight: 800;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .sm {
+            font-size: 12px;
+            color: rgba(238,241,246,0.70);
+            margin-top: 3px
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end
+        }
+
+        .chip {
+            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(0,0,0,0.18);
+            white-space: nowrap;
+        }
+
+            .chip.acc {
+                background: rgba(114,137,218,0.22);
+                border-color: rgba(114,137,218,0.40)
+            }
+
+            .chip.rej {
+                background: rgba(255,107,107,0.18);
+                border-color: rgba(255,107,107,0.32)
+            }
+
+        .toast {
+            position: fixed;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.45);
+            border: 1px solid rgba(255,255,255,0.10);
+            padding: 10px 12px;
+            border-radius: 999px;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+            font-size: 13px;
+            z-index: 9998;
+            backdrop-filter: blur(10px);
+        }
+
+        @media (max-width:900px) {
+            .shell {
+                grid-template-columns: 1fr
+            }
+
+            .sidebar {
+                position: static;
+                height: auto
+            }
+
+            .controls {
+                grid-template-columns: 1fr
+            }
+
+            .prompt-grid {
+                grid-template-columns: 1fr
+            }
+
+                .prompt-grid button {
+                    grid-column: auto
+                }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- LOADER -->
+    <div id="loader" class="loader" aria-label="Loading screen">
+        <div class="loader-inner">
+            <div class="loader-title">Event Staff Tracker</div>
+            <div class="loader-sub">Loading…</div>
+            <div class="bar"><span></span></div>
+            <div class="loader-meta">
+                <span id="loadHint">Starting…</span>
+                <span id="loadPct">0%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="loginWrap" class="login-wrap">
+        <div class="login-card glass">
+            <div class="title">Event Staff Tracker</div>
+            <div class="subtitle">Admin login for <b>Nugg</b> • Enter password</div>
+
+            <div class="stack">
+                <input id="password" type="password" placeholder="Password (default: 1)" />
+                <button class="btn btn-primary" onclick="login()">Login</button>
+                <div id="loginMsg" class="error"></div>
+                <div id="statusText" class="mini">Status: loading…</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP -->
+    <div id="app" class="app">
+        <div class="shell">
+            <!-- sidebar -->
+            <div class="sidebar glass">
+                <div class="brand">
+                    <div>
+                        <div class="name">Dashboard</div>
+                        <div class="mini">Event Staff Tracker</div>
+                    </div>
+                    <div class="pill" id="userPill">Nugg</div>
+                </div>
+
+                <div class="nav">
+                    <button id="tabBtnNotes" class="active" onclick="openTab('notesTab')">🗒 Notes</button>
+                    <button id="tabBtnAdd" onclick="openTab('addTab')">➕ Add Note</button>
+                    <button id="tabBtnDecisions" onclick="openTab('decisionsTab')">✅ Decisions</button>
+                    <button id="tabBtnStorage" onclick="openTab('storageTab')">📦 Storage</button>
+                    <button id="tabBtnSettings" onclick="openTab('settingsTab')">⚙ Settings</button>
+                </div>
+
+                <div class="sidebar-bottom">
+                    <button class="btn" style="background:rgba(255,107,107,0.14);border-color:rgba(255,107,107,0.25)" onclick="logout()">Logout</button>
+                    <div class="mini">Synced with Firestore ✅</div>
+                </div>
+            </div>
+
+            <!-- content -->
+            <div class="content">
+                <div class="topbar glass">
+                    <div>
+                        <h2 id="topTitle">Notes</h2>
+                        <div class="muted" id="topDesc">Search and filter your notes.</div>
+                    </div>
+                    <div class="pill" id="topUser">Logged in as Nugg</div>
+                </div>
+
+                <div class="grid">
+                    <!-- notes -->
+                    <div id="notesTab" class="tab active glass notes">
+                        <div class="mini">Your notes are private to your admin login.</div>
+                        <div class="controls">
+                            <input id="searchInput" placeholder="Search notes…" />
+                            <select id="filterStaff">
+                                <option value="__all__">All staff</option>
+                                <option>Masonman585</option>
+                                <option>𝙷𝚊𝚣𝚖𝚊𝚝</option>
+                                <option>civda</option>
+                                <option>Glitch</option>
+                                <option>Dafound1</option>
+                                <option>Nate</option>
+                                <option>Riskhunter</option>
+                                <option>SmokeSteelz</option>
+                            </select>
+                        </div>
+                        <div id="notesList" class="mini" style="margin-top:12px;">Loading…</div>
+                    </div>
+
+                    <!-- add -->
+                    <div id="addTab" class="tab glass card">
+                        <h3>Add a note</h3>
+                        <div class="hint">Use prompts to help write consistent notes.</div>
+
+                        <select id="staffName">
+                            <option value="" disabled selected>Select Staff</option>
+                            <option>Masonman585</option>
+                            <option>𝙷𝚊𝚣𝚖𝚊𝚝</option>
+                            <option>civda</option>
+                            <option>Glitch</option>
+                            <option>Dafound1</option>
+                            <option>Nate</option>
+                            <option>Riskhunter</option>
+                            <option>SmokeSteelz</option>
+                        </select>
+
+                        <textarea id="staffNote" placeholder="Write your notes here…"></textarea>
+
+                        <div class="hint" style="margin-top:10px;">Quick prompts</div>
+                        <div class="prompt-grid">
+                            <select id="tonePick">
+                                <option value="">Tone / Voice…</option>
+                                <option>Calm / quiet</option>
+                                <option>Normal</option>
+                                <option>Loud / energetic</option>
+                                <option>Too loud / talked over people</option>
+                            </select>
+
+                            <select id="confidencePick">
+                                <option value="">Confidence…</option>
+                                <option>Confident</option>
+                                <option>A bit nervous</option>
+                                <option>Unsure / needed help</option>
+                                <option>Very confident</option>
+                            </select>
+
+                            <select id="hostingPick">
+                                <option value="">Hosting skill…</option>
+                                <option>Explained rules clearly</option>
+                                <option>Kept players engaged</option>
+                                <option>Good time management</option>
+                                <option>Struggled to control group</option>
+                                <option>Missed key steps</option>
+                            </select>
+
+                            <select id="behaviourPick">
+                                <option value="">Behaviour…</option>
+                                <option>Respectful</option>
+                                <option>Friendly</option>
+                                <option>Patient</option>
+                                <option>Got frustrated</option>
+                                <option>Was rude / targeted people</option>
+                            </select>
+
+                            <select id="pacingPick">
+                                <option value="">Event flow…</option>
+                                <option>Started quickly</option>
+                                <option>Smooth transitions</option>
+                                <option>Great pacing</option>
+                                <option>Slow start</option>
+                                <option>Lots of downtime</option>
+                            </select>
+
+                            <select id="ratingPick">
+                                <option value="">Overall rating…</option>
+                                <option>⭐ 1 (Not ready)</option>
+                                <option>⭐⭐ 2 (Needs training)</option>
+                                <option>⭐⭐⭐ 3 (Okay)</option>
+                                <option>⭐⭐⭐⭐ 4 (Good)</option>
+                                <option>⭐⭐⭐⭐⭐ 5 (Excellent)</option>
+                            </select>
+
+                            <select id="recommendPick">
+                                <option value="">Recommendation…</option>
+                                <option>✅ Pass</option>
+                                <option>🟡 Maybe / needs training</option>
+                                <option>❌ Fail</option>
+                            </select>
+
+                            <button class="btn" type="button" onclick="applyPrompts()">Add prompts to note</button>
+                        </div>
+
+                        <div class="prompt-actions">
+                            <button class="btn btn-primary" onclick="addNote()">Save Note</button>
+                        </div>
+                    </div>
+
+                    <!-- decisions -->
+                    <div id="decisionsTab" class="tab glass list-wrap">
+                        <h3 style="margin:0;">Decisions</h3>
+                        <div class="hint">Mark Accepted / Rejected / Pending. “View latest note” shows the newest note for that staff.</div>
+                        <div id="decisionsList" class="mini" style="margin-top:12px;">Loading…</div>
+                    </div>
+
+                    <!-- storage -->
+                    <div id="storageTab" class="tab glass list-wrap">
+                        <h3 style="margin:0;">Storage</h3>
+                        <div class="hint">Moved people live here (safe list for coming months).</div>
+                        <div id="storageList" class="mini" style="margin-top:12px;">Loading…</div>
+                    </div>
+
+                    <!-- settings -->
+                    <div id="settingsTab" class="tab glass card">
+                        <h3>Settings</h3>
+                        <div class="hint">Device options.</div>
+                        <button class="btn" onclick="localStorage.clear(); showToast('Local storage cleared ✅');">Clear local storage (this device)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script type="module">
+        // ===== Loader =====
+        const loaderEl = document.getElementById("loader");
+        const loadHint = document.getElementById("loadHint");
+        const loadPct = document.getElementById("loadPct");
+
+        let fakePct = 0;
+        let pctTimer = null;
+
+        function setHint(t) { loadHint.textContent = t; }
+        function setPct(p) {
+            fakePct = Math.max(fakePct, Math.min(99, Math.floor(p)));
+            loadPct.textContent = fakePct + "%";
+        }
+        function startFakeProgress() {
+            if (pctTimer) return;
+            pctTimer = setInterval(() => {
+                if (fakePct < 92) fakePct += (fakePct < 40 ? 3 : fakePct < 70 ? 2 : 1);
+                loadPct.textContent = fakePct + "%";
+            }, 180);
+        }
+        function finishLoader() {
+            clearInterval(pctTimer);
+            fakePct = 100;
+            loadPct.textContent = "100%";
+            setHint("Ready ✅");
+            loaderEl.classList.add("hide");
+            setTimeout(() => loaderEl.remove(), 650);
+        }
+
+        setHint("Booting…");
+        startFakeProgress();
+
+        // ===== Firebase =====
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+        import {
+            getFirestore, collection, addDoc, query, where,
+            onSnapshot, deleteDoc, doc, updateDoc, getDoc, setDoc
+        } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+        setHint("Loading Firebase…");
+        setPct(25);
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQnBtnX3IeSD3PSBJz-6qzdZ1TeFdIU-Y",
+            authDomain: "event-host-we.firebaseapp.com",
+            projectId: "event-host-we",
+            storageBucket: "event-host-we.firebasestorage.app",
+            messagingSenderId: "935018089447",
+            appId: "1:935018089447:web:02893483daf382c4098b42",
+            measurementId: "G-5J3L06TL7E"
+        };
+
+        // ✅ Single admin
+        const ADMIN_ID = "1229027284346994703";
+        const ADMIN_NAME = "Nugg";
+        const passwordRequired = "1"; // change if you want
+
+        const STAFF_LIST = [
+            "Masonman585",
+            "𝙷𝚊𝚣𝚖𝚊𝚝",
+            "civda",
+            "Glitch",
+            "Dafound1",
+            "Nate",
+            "Riskhunter",
+            "SmokeSteelz"
+        ];
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        document.getElementById("statusText").textContent = "Status: ready ✅";
+
+        let latestNotes = [];
+        let editingDocId = null;
+
+        let statusMap = {};   // staffName -> accepted/rejected/pending
+        let storageMap = {};  // staffName -> true
+
+        let unsubNotes = null;
+        let unsubStatus = null;
+        let unsubStorage = null;
+
+        function showToast(msg) {
+            const t = document.getElementById("toast");
+            t.textContent = msg;
+            t.style.display = "block";
+            clearTimeout(showToast._timer);
+            showToast._timer = setTimeout(() => t.style.display = "none", 1600);
+        }
+
+        function escapeHtml(s) {
+            return (s ?? "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;");
+        }
+
+        // Tabs
+        window.openTab = function (tabId) {
+            const allTabs = ["notesTab", "addTab", "decisionsTab", "storageTab", "settingsTab"];
+            allTabs.forEach(id => document.getElementById(id).classList.remove("active"));
+            document.getElementById(tabId).classList.add("active");
+
+            const btns = [
+                ["tabBtnNotes", "notesTab", "Notes", "Search and filter your notes."],
+                ["tabBtnAdd", "addTab", "Add Note", "Write a new note for trial staff."],
+                ["tabBtnDecisions", "decisionsTab", "Decisions", "Mark accepted/rejected and view latest notes."],
+                ["tabBtnStorage", "storageTab", "Storage", "Keep names safe for coming months."],
+                ["tabBtnSettings", "settingsTab", "Settings", "Device options."]
+            ];
+            btns.forEach(([btnId]) => document.getElementById(btnId).classList.remove("active"));
+            const found = btns.find(x => x[1] === tabId);
+            if (found) {
+                const [btnId, , title, desc] = found;
+                document.getElementById(btnId).classList.add("active");
+                document.getElementById("topTitle").textContent = title;
+                document.getElementById("topDesc").textContent = desc;
+            }
+
+            if (tabId === "decisionsTab") renderDecisions();
+            if (tabId === "storageTab") renderStorage();
+        };
+
+        function showApp() {
+            document.getElementById("loginWrap").style.display = "none";
+            document.getElementById("app").style.display = "block";
+        }
+        function showLogin() {
+            document.getElementById("app").style.display = "none";
+            document.getElementById("loginWrap").style.display = "grid";
+        }
+
+        function enc(s) { return encodeURIComponent(s); }
+        function docId(user, staff) { return `${user}__${enc(staff)}`; }
+
+        function staffNotStored() {
+            return STAFF_LIST.filter(n => !storageMap[n]);
+        }
+
+        function getLatestNoteFor(staffName) {
+            const notes = latestNotes.filter(n => n.staffName === staffName);
+            if (!notes.length) return null;
+            notes.sort((a, b) => (b.date || 0) - (a.date || 0));
+            return notes[0];
+        }
+
+        function startNotesListener() {
+            const user = sessionStorage.getItem("user");
+            if (!user) return;
+            if (unsubNotes) unsubNotes();
+
+            const q = query(collection(db, "notes"), where("by", "==", user));
+            unsubNotes = onSnapshot(q, snap => {
+                const notes = [];
+                snap.forEach(ds => notes.push({ id: ds.id, ...ds.data() }));
+                notes.sort((a, b) => (b.date || 0) - (a.date || 0));
+                latestNotes = notes;
+                renderNotes();
+                renderDecisions();
+            }, err => {
+                console.error(err);
+                document.getElementById("notesList").textContent = "Error loading notes (check console).";
+            });
+        }
+
+        function startStatusListener() {
+            const user = sessionStorage.getItem("user");
+            if (!user) return;
+            if (unsubStatus) unsubStatus();
+
+            const q = query(collection(db, "staffStatus"), where("by", "==", user));
+            unsubStatus = onSnapshot(q, snap => {
+                const map = {};
+                snap.forEach(ds => {
+                    const d = ds.data();
+                    if (d?.staffName) map[d.staffName] = d.status || "pending";
+                });
+                statusMap = map;
+                renderDecisions();
+            });
+        }
+
+        function startStorageListener() {
+            const user = sessionStorage.getItem("user");
+            if (!user) return;
+            if (unsubStorage) unsubStorage();
+
+            const q = query(collection(db, "storage"), where("by", "==", user));
+            unsubStorage = onSnapshot(q, snap => {
+                const map = {};
+                snap.forEach(ds => {
+                    const d = ds.data();
+                    if (d?.staffName) map[d.staffName] = true;
+                });
+                storageMap = map;
+                renderDecisions();
+                renderStorage();
+            });
+        }
+
+        async function setDecision(staff, status) {
+            const user = sessionStorage.getItem("user");
+            if (!user) return;
+            await setDoc(doc(db, "staffStatus", docId(user, staff)), {
+                by: user,
+                byName: ADMIN_NAME,
+                staffName: staff,
+                status,
+                updated: Date.now()
+            }, { merge: true });
+        }
+
+        async function moveToStorage(staff) {
+            const user = sessionStorage.getItem("user");
+            if (!user) return;
+            await setDoc(doc(db, "storage", docId(user, staff)), {
+                by: user,
+                byName: ADMIN_NAME,
+                staffName: staff,
+                movedAt: Date.now()
+            }, { merge: true });
+            showToast("Moved to storage 📦");
+        }
+
+        async function restoreFromStorage(staff) {
+            const user = sessionStorage.getItem("user");
+            if (!user) return;
+            await deleteDoc(doc(db, "storage", docId(user, staff)));
+            showToast("Restored ✅");
+        }
+
+        // Render Notes
+        function renderNotes() {
+            const list = document.getElementById("notesList");
+            const search = document.getElementById("searchInput").value.trim().toLowerCase();
+            const filter = document.getElementById("filterStaff").value;
+
+            let notes = [...latestNotes];
+            if (filter !== "__all__") notes = notes.filter(n => n.staffName === filter);
+
+            if (search) {
+                notes = notes.filter(n =>
+                    (n.staffName || "").toLowerCase().includes(search) ||
+                    (n.staffNote || "").toLowerCase().includes(search) ||
+                    (n.byName || "").toLowerCase().includes(search)
+                );
+            }
+
+            list.innerHTML = "";
+            if (!notes.length) { list.textContent = "No notes found."; return; }
+
+            for (const n of notes) {
+                const div = document.createElement("div");
+                div.className = "note";
+                div.innerHTML = `
+              <button class="delete-btn" type="button" onclick="deleteNote('${n.id}')">Delete</button>
+              <button class="delete-btn" type="button" style="right:78px;" onclick="editNote('${n.id}')">Edit</button>
+              <div class="note-title">${escapeHtml(n.staffName)}</div>
+              <div class="note-meta">${new Date(n.date).toLocaleString()} • ${escapeHtml(n.byName || ADMIN_NAME)}</div>
+              <div class="note-text">${escapeHtml(n.staffNote)}</div>
+            `;
+                list.appendChild(div);
+            }
+        }
+
+        document.getElementById("searchInput").addEventListener("input", renderNotes);
+        document.getElementById("filterStaff").addEventListener("change", renderNotes);
+
+        // Render Decisions
+        function renderDecisions() {
+            const host = document.getElementById("decisionsList");
+            if (!host) return;
+
+            const list = staffNotStored();
+            host.innerHTML = "";
+
+            if (!list.length) {
+                host.textContent = "No staff here (everyone is in Storage).";
+                return;
+            }
+
+            for (const name of list) {
+                const status = statusMap[name] || "pending";
+                const latest = getLatestNoteFor(name);
+                const preview = latest?.staffNote
+                    ? (latest.staffNote.length > 85 ? latest.staffNote.slice(0, 85) + "…" : latest.staffNote)
+                    : "No notes yet.";
+
+                const chip =
+                    status === "accepted" ? `<span class="chip acc">✅ Accepted</span>` :
+                        status === "rejected" ? `<span class="chip rej">❌ Rejected</span>` :
+                            `<span class="chip">— Pending</span>`;
+
+                const row = document.createElement("div");
+                row.className = "row";
+                row.innerHTML = `
+              <div class="left">
+                <div class="nm">${escapeHtml(name)}</div>
+                <div class="sm">${escapeHtml(preview)}</div>
+              </div>
+              <div class="actions">
+                ${chip}
+                <button class="btn-mini" type="button">View latest note</button>
+                <button class="btn-mini" type="button">Accept</button>
+                <button class="btn-mini" type="button">Reject</button>
+                <button class="btn-mini" type="button">Clear</button>
+                <button class="btn-mini" type="button">Move to Storage</button>
+              </div>
+            `;
+
+                const buttons = row.querySelectorAll("button");
+                const bView = buttons[0];
+                const bAcc = buttons[1];
+                const bRej = buttons[2];
+                const bClear = buttons[3];
+                const bStore = buttons[4];
+
+                bView.onclick = () => {
+                    const n = getLatestNoteFor(name);
+                    if (!n) return alert(`${name}\n\n(No notes yet)`);
+                    alert(`${name}\n\n${n.staffNote}\n\n(${new Date(n.date).toLocaleString()})`);
+                };
+
+                bAcc.onclick = async () => { try { await setDecision(name, "accepted"); showToast("Accepted ✅"); } catch (e) { console.error(e); showToast("Save failed"); } };
+                bRej.onclick = async () => { try { await setDecision(name, "rejected"); showToast("Rejected ❌"); } catch (e) { console.error(e); showToast("Save failed"); } };
+                bClear.onclick = async () => { try { await setDecision(name, "pending"); showToast("Cleared ✅"); } catch (e) { console.error(e); showToast("Save failed"); } };
+                bStore.onclick = async () => { try { await moveToStorage(name); } catch (e) { console.error(e); showToast("Move failed"); } };
+
+                host.appendChild(row);
+            }
+        }
+
+        // Render Storage
+        function renderStorage() {
+            const host = document.getElementById("storageList");
+            if (!host) return;
+
+            const names = Object.keys(storageMap).sort((a, b) => a.localeCompare(b));
+            host.innerHTML = "";
+
+            if (!names.length) {
+                host.textContent = "Storage is empty.";
+                return;
+            }
+
+            for (const name of names) {
+                const row = document.createElement("div");
+                row.className = "row";
+                row.innerHTML = `
+              <div class="left">
+                <div class="nm">${escapeHtml(name)}</div>
+                <div class="sm">Stored</div>
+              </div>
+              <div class="actions">
+                <button class="btn-mini" type="button">Restore</button>
+              </div>
+            `;
+                row.querySelector("button").onclick = async () => { try { await restoreFromStorage(name); } catch (e) { console.error(e); showToast("Restore failed"); } };
+                host.appendChild(row);
+            }
+        }
+
+        // Prompts
+        window.applyPrompts = function () {
+            const tone = document.getElementById("tonePick").value;
+            const conf = document.getElementById("confidencePick").value;
+            const host = document.getElementById("hostingPick").value;
+            const beh = document.getElementById("behaviourPick").value;
+            const pace = document.getElementById("pacingPick").value;
+            const rate = document.getElementById("ratingPick").value;
+            const rec = document.getElementById("recommendPick").value;
+
+            const parts = [];
+            if (tone) parts.push(`• Tone: ${tone}`);
+            if (conf) parts.push(`• Confidence: ${conf}`);
+            if (host) parts.push(`• Hosting: ${host}`);
+            if (beh) parts.push(`• Behaviour: ${beh}`);
+            if (pace) parts.push(`• Event flow: ${pace}`);
+            if (rate) parts.push(`• Rating: ${rate}`);
+            if (rec) parts.push(`• Recommendation: ${rec}`);
+
+            if (!parts.length) return showToast("Pick prompts first");
+
+            const box = document.getElementById("staffNote");
+            const block = parts.join("\n");
+            box.value = (box.value ? box.value.trimEnd() + "\n\n" : "") + block + "\n";
+            showToast("Prompts added ✅");
+        };
+
+        // Edit note
+        window.editNote = async function (docId) {
+            try {
+                const user = sessionStorage.getItem("user");
+                if (!user) return;
+
+                const snap = await getDoc(doc(db, "notes", docId));
+                if (!snap.exists()) return showToast("Note not found");
+
+                const data = snap.data();
+                if (data.by !== user) return showToast("Not allowed");
+
+                editingDocId = docId;
+                document.getElementById("staffName").value = data.staffName || "";
+                document.getElementById("staffNote").value = data.staffNote || "";
+
+                openTab("addTab");
+                showToast("Editing… ✅");
+            } catch (e) {
+                console.error(e);
+                showToast("Edit failed");
+            }
+        };
+
+        // Save note
+        window.addNote = async function () {
+            const staff = document.getElementById("staffName").value;
+            const note = document.getElementById("staffNote").value.trim();
+            const user = sessionStorage.getItem("user");
+            if (!staff || !note) return showToast("Fill staff + note first");
+
+            try {
+                if (editingDocId) {
+                    await updateDoc(doc(db, "notes", editingDocId), { staffName: staff, staffNote: note, date: Date.now() });
+                    editingDocId = null;
+                    document.getElementById("staffNote").value = "";
+                    openTab("notesTab");
+                    showToast("Updated ✅");
+                    return;
+                }
+
+                await addDoc(collection(db, "notes"), {
+                    staffName: staff,
+                    staffNote: note,
+                    by: user,
+                    byName: ADMIN_NAME,
+                    date: Date.now()
+                });
+
+                document.getElementById("staffNote").value = "";
+                openTab("notesTab");
+                showToast("Saved ✅");
+            } catch (e) {
+                console.error(e);
+                showToast("Save failed");
+            }
+        };
+
+        // Delete note
+        window.deleteNote = async function (docId) {
+            try {
+                await deleteDoc(doc(db, "notes", docId));
+                if (editingDocId === docId) editingDocId = null;
+                showToast("Deleted ✅");
+            } catch (e) {
+                console.error(e);
+                showToast("Delete failed");
+            }
+        };
+
+        // ✅ Single-admin login
+        window.login = async function () {
+            const pass = document.getElementById("password").value;
+            const msg = document.getElementById("loginMsg");
+            msg.textContent = "";
+
+            if (pass !== passwordRequired) { msg.textContent = "Wrong password."; return; }
+
+            try {
+                await signInAnonymously(auth);
+                sessionStorage.setItem("user", ADMIN_ID);
+
+                showApp();
+                openTab("notesTab");
+
+                startNotesListener();
+                startStatusListener();
+                startStorageListener();
+
+                showToast("Logged in ✅");
+            } catch (e) {
+                console.error(e);
+                msg.textContent = "Firebase auth failed (open Console).";
+            }
+        };
+
+        window.logout = function () {
+            sessionStorage.removeItem("user");
+            if (unsubNotes) unsubNotes();
+            if (unsubStatus) unsubStatus();
+            if (unsubStorage) unsubStorage();
+
+            latestNotes = [];
+            statusMap = {};
+            storageMap = {};
+            editingDocId = null;
+
+            showLogin();
+            showToast("Logged out ✅");
+        };
+
+        // Resume session
+        if (sessionStorage.getItem("user") === ADMIN_ID) {
+            showApp();
+            openTab("notesTab");
+            startNotesListener();
+            startStatusListener();
+            startStorageListener();
+        } else {
+            sessionStorage.removeItem("user");
+        }
+
+        // finish loader
+        setHint("Finalising…");
+        setPct(90);
+        setTimeout(() => finishLoader(), 450);
+    </script>
+</body>
+</html>
