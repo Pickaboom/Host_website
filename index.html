@@ -1,14 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event Staff Tracker</title>
 
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -578,35 +576,25 @@
 
 <body>
     <!-- LOADER -->
-    <div id="loader" class="loader" aria-label="Loading screen">
-        <div class="loader-inner">
-            <div class="loader-title">Event Staff Tracker</div>
-            <div class="loader-sub">Loading…</div>
-            <div class="bar"><span></span></div>
-            <div class="loader-meta">
-                <span id="loadHint">Starting…</span>
-                <span id="loadPct">0%</span>
-            </div>
-        </div>
-    </div>
+    
 
     <!-- LOGIN -->
-    <div id="loginWrap" class="login-wrap">
+    <div id="loginWrap" class="login-wrap" style="display: none;">
         <div class="login-card glass">
             <div class="title">Event Staff Tracker</div>
             <div class="subtitle">Admin login for <b>Nugg</b> • Enter password</div>
 
             <div class="stack">
-                <input id="password" type="password" placeholder="Password (default: 1)" />
+                <input id="password" type="password" placeholder="Password (default: 1)">
                 <button class="btn btn-primary" onclick="login()">Login</button>
                 <div id="loginMsg" class="error"></div>
-                <div id="statusText" class="mini">Status: loading…</div>
+                <div id="statusText" class="mini">Status: ready ✅</div>
             </div>
         </div>
     </div>
 
     <!-- APP -->
-    <div id="app" class="app">
+    <div id="app" class="app" style="display: block;">
         <div class="shell">
             <!-- sidebar -->
             <div class="sidebar glass">
@@ -620,9 +608,9 @@
 
                 <div class="nav">
                     <button id="tabBtnNotes" class="active" onclick="openTab('notesTab')">🗒 Notes</button>
-                    <button id="tabBtnAdd" onclick="openTab('addTab')">➕ Add Note</button>
-                    <button id="tabBtnDecisions" onclick="openTab('decisionsTab')">✅ Decisions</button>
-                    <button id="tabBtnStorage" onclick="openTab('storageTab')">📦 Storage</button>
+                    <button id="tabBtnAdd" onclick="openTab('addTab')" class="">➕ Add Note</button>
+                    <button id="tabBtnDecisions" onclick="openTab('decisionsTab')" class="">✅ Decisions</button>
+                    <button id="tabBtnStorage" onclick="openTab('storageTab')" class="">📦 Storage</button>
                     <button id="tabBtnSettings" onclick="openTab('settingsTab')">⚙ Settings</button>
                 </div>
 
@@ -644,21 +632,21 @@
 
                 <div class="grid">
                     <!-- notes -->
-                    <div id="notesTab" class="tab active glass notes">
+                    <div id="notesTab" class="tab glass notes active">
                         <div class="mini">Your notes are private to your admin login.</div>
                         <div class="controls">
-                            <input id="searchInput" placeholder="Search notes…" />
+                            <input id="searchInput" placeholder="Search notes…">
                             <select id="filterStaff">
                                 <option value="__all__">All staff</option>
-                                <option>lemonndoescode</option>
-                                <option>bugtoots101_96811</option>
-                                <option>ismael.vr</option>
-                                <option>xenon_gamer14</option>
-                                <option>smokeyz.1</option>
-                                <option>[( Swedish )]</option>
-                            </select>
+                                <option>YeeperJR</option>
+                                <option>Idkk</option>
+                                
+                                
+                                
+                                
+                            <option>Jolo</option></select>
                         </div>
-                        <div id="notesList" class="mini" style="margin-top:12px;">Loading…</div>
+                        <div id="notesList" class="mini" style="margin-top:12px;">No notes found.</div>
                     </div>
 
                     <!-- add -->
@@ -667,7 +655,7 @@
                         <div class="hint">Use prompts to help write consistent notes.</div>
 
                         <select id="staffName">
-                            <option value="" disabled selected>Select Staff</option>
+                            <option value="" disabled="" selected="">Select Staff</option>
                             <option>lemonndoescode</option>
                             <option>bugtoots101_96811</option>
                             <option>ismael.vr</option>
@@ -751,14 +739,78 @@
                     <div id="decisionsTab" class="tab glass list-wrap">
                         <h3 style="margin:0;">Decisions</h3>
                         <div class="hint">Mark Accepted / Rejected / Pending. “View latest note” shows the newest note for that staff.</div>
-                        <div id="decisionsList" class="mini" style="margin-top:12px;">Loading…</div>
+                        <div id="decisionsList" class="mini" style="margin-top:12px;">No staff here (everyone is in Storage).</div>
                     </div>
 
                     <!-- storage -->
                     <div id="storageTab" class="tab glass list-wrap">
                         <h3 style="margin:0;">Storage</h3>
                         <div class="hint">Moved people live here (safe list for coming months).</div>
-                        <div id="storageList" class="mini" style="margin-top:12px;">Loading…</div>
+                        <div id="storageList" class="mini" style="margin-top:12px;"><div class="row">
+              <div class="left">
+                <div class="nm">civda</div>
+                <div class="sm">Stored</div>
+              </div>
+              <div class="actions">
+                <button class="btn-mini" type="button">Restore</button>
+              </div>
+            </div><div class="row">
+              <div class="left">
+                <div class="nm">Dafound1</div>
+                <div class="sm">Stored</div>
+              </div>
+              <div class="actions">
+                <button class="btn-mini" type="button">Restore</button>
+              </div>
+            </div><div class="row">
+              <div class="left">
+                <div class="nm">Glitch</div>
+                <div class="sm">Stored</div>
+              </div>
+              <div class="actions">
+                <button class="btn-mini" type="button">Restore</button>
+              </div>
+            </div><div class="row">
+              <div class="left">
+                <div class="nm">𝙷𝚊𝚣𝚖𝚊𝚝</div>
+                <div class="sm">Stored</div>
+              </div>
+              <div class="actions">
+                <button class="btn-mini" type="button">Restore</button>
+              </div>
+            </div><div class="row">
+              <div class="left">
+                <div class="nm">Masonman585</div>
+                <div class="sm">Stored</div>
+              </div>
+              <div class="actions">
+                <button class="btn-mini" type="button">Restore</button>
+              </div>
+            </div><div class="row">
+              <div class="left">
+                <div class="nm">Nate</div>
+                <div class="sm">Stored</div>
+              </div>
+              <div class="actions">
+                <button class="btn-mini" type="button">Restore</button>
+              </div>
+            </div><div class="row">
+              <div class="left">
+                <div class="nm">Riskhunter</div>
+                <div class="sm">Stored</div>
+              </div>
+              <div class="actions">
+                <button class="btn-mini" type="button">Restore</button>
+              </div>
+            </div><div class="row">
+              <div class="left">
+                <div class="nm">SmokeSteelz</div>
+                <div class="sm">Stored</div>
+              </div>
+              <div class="actions">
+                <button class="btn-mini" type="button">Restore</button>
+              </div>
+            </div></div>
                     </div>
 
                     <!-- settings -->
@@ -772,7 +824,7 @@
         </div>
     </div>
 
-    <div id="toast" class="toast"></div>
+    <div id="toast" class="toast" style="display: none;">Deleted ✅</div>
 
     <script type="module">
         // ===== Loader =====
@@ -1295,5 +1347,6 @@
         setPct(90);
         setTimeout(() => finishLoader(), 450);
     </script>
-</body>
-</html>
+
+
+</body></html>
